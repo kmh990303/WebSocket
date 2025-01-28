@@ -1,39 +1,57 @@
-const messageList = document.querySelector("ul");
-const nickForm = document.querySelector("#nick");
-const messageForm = document.querySelector("#message");
-const socket = new WebSocket(`ws://${window.location.host}`);
+// webSocket만 활용
+// const messageList = document.querySelector("ul");
+// const nickForm = document.querySelector("#nick");
+// const messageForm = document.querySelector("#message");
+// const socket = new WebSocket(`ws://${window.location.host}`);
 
-function makeMessage(type, payload) {
-    const msg = { type, payload };
-    return JSON.stringify(msg);
-}
+// function makeMessage(type, payload) {
+//     const msg = { type, payload };
+//     return JSON.stringify(msg);
+// }
 
-socket.addEventListener("open", () => {
-    console.log("Connected to Server");
-})
+// socket.addEventListener("open", () => {
+//     console.log("Connected to Server");
+// })
 
-socket.addEventListener("message", async (message) => {
-    const li = document.createElement("li");
-    li.innerText = message.data;
-    messageList.append(li);
-});
+// socket.addEventListener("message", async (message) => {
+//     const li = document.createElement("li");
+//     li.innerText = message.data;
+//     messageList.append(li);
+// });
 
-socket.addEventListener("close", () => {
-    console.log("Disconnected to Server");
-})
+// socket.addEventListener("close", () => {
+//     console.log("Disconnected to Server");
+// })
 
-function handleSubmit(event) {
+// function handleSubmit(event) {
+//     event.preventDefault();
+//     const input = messageForm.querySelector("input");
+//     socket.send(makeMessage("new_message", input.value));
+//     input.value = '';
+// }
+
+// function handleNickSubmit(event) {
+//     event.preventDefault();
+//     const input = nickForm.querySelector("input");
+//     socket.send(makeMessage("nickname", input.value));
+// }
+
+// messageForm.addEventListener('submit', handleSubmit);
+// nickForm.addEventListener('submit', handleNickSubmit);
+
+
+const socket = io();
+
+const welcome = document.getElementById("welcome");
+const form = welcome.querySelector("form");
+
+function handleRoomSubmit(event) {
     event.preventDefault();
-    const input = messageForm.querySelector("input");
-    socket.send(makeMessage("new_message", input.value));
-    input.value = '';
+    const input = form.querySelector("input");
+    socket.emit("enter_room", { payload: input.value }, () => {
+        console.log("server is done!");
+    }); // socket.send 대체
+    input.value = "";
 }
 
-function handleNickSubmit(event) {
-    event.preventDefault();
-    const input = nickForm.querySelector("input");
-    socket.send(makeMessage("nickname", input.value));
-}
-
-messageForm.addEventListener('submit', handleSubmit);
-nickForm.addEventListener('submit', handleNickSubmit);
+form.addEventListener("submit", handleRoomSubmit);
